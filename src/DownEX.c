@@ -1056,7 +1056,7 @@ int main (int argc,char **argv)
 	Cargc=argc;
 	if (curl_global_init(CURL_GLOBAL_ALL)){
 		printf("Global init\n");
-		return 1;
+		exit(1);
 	}
 
 	if ((Mutex=CreateMutex(NULL,FALSE,NULL))==NULL){
@@ -1072,12 +1072,12 @@ int main (int argc,char **argv)
 	cookie=malloc(sizeof(char)*100);
 	if (cookie==NULL){
 		perror("Malloc cookie");
-		return 1;
+		exit(1);
 	}
 	DefaultFile=malloc(sizeof(char)*100);
 	if (cookie==NULL){
 		perror("Malloc DefaultFile");
-		return 1;
+		exit(1);
 	}
 	memset(cookie,0,sizeof(char)*100);
 	memset(DefaultFile,0,sizeof(char)*100);
