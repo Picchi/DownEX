@@ -26,19 +26,13 @@ struct _Tag{
 	char ** l;
 };
 
-//struct Mem HP,char *LinkPage ,CURL * curl,
-//unsigned long SecSleep,int MinPage,char ** proxy,int ProxyNum,unsigned int PageMax,unsigned int *PageNow)
 
 typedef struct _ParamGallery
 {
-	//struct Mem HP;
+	
 	char **LinkPage;
-	///CURL *curl;
-	//unsigned long SecSleep;
-	//int MinPage;
 	char **proxy;
 	int ProxyNum;
-	//unsigned int PageMax;
 	int NumGallery;
 	uint8_t Verbose;
 	DWORD ThreadId;
@@ -55,8 +49,6 @@ CS CSTable[]={
 };
 
 int MaxTry=1;
-//int MinPage=0;
-//int Lock=0;
 HANDLE Mutex=NULL;
 HANDLE MutexNumGallery=NULL;
 uint8_t EndProg=0;
@@ -68,25 +60,21 @@ char *cookie=NULL;
 int GalleryNum=0;
 int NumGallery;
 
-//inline void _ReleaseMutex(HANDLE Mutex)
-//inline void _ReleaseMutex()
 static inline void __attribute__((always_inline)) _ReleaseMutex(HANDLE Mutex)
 {
-	//printf("Release Mutex %d\n",Lock);
-	//Lock--;
 	if (!ReleaseMutex(Mutex)){ 
 		printf("Problema rilascio mutex %lu\n",GetLastError());
 		exit(1);
 	}
 }
 
-//inline void  _WaitForSingleObject()
+
 static inline void __attribute__((always_inline)) _WaitForSingleObject(HANDLE Mutex)
 {
-	//printf("Try Lock Mutex %d   ",Lock);
+	
 	WaitForSingleObject(Mutex, INFINITE);
-	//Lock++;
-	//printf("Lock Mutex   ");
+	
+	
 }
 
 
@@ -109,11 +97,9 @@ size_t WriteImg(char *ptr, size_t size, size_t nmemb, void *userdata)
 	return fwrite(ptr,size,nmemb,(FILE*)userdata);
 }
 
-//char * GetLinkReverse ( char *S, char *F, char *L, char **end)
 uint8_t GetLinkReverse ( char *S, char *F, char *L, char **end,char **Link)
 {
 	char *ptr1,*ptr2;
-	//char *Link;
 	size_t diff,len;
 
 	*Link=NULL;
@@ -125,7 +111,6 @@ uint8_t GetLinkReverse ( char *S, char *F, char *L, char **end,char **Link)
 			ptr2--;
 		}
 		if (ptr2==S){
-			//printf("No match\n");
 			return 1;
 		}
 	}
@@ -138,7 +123,6 @@ uint8_t GetLinkReverse ( char *S, char *F, char *L, char **end,char **Link)
 			ptr1--;
 		}
 		if (ptr1==S-1){
-			//printf("No match\n");
 			return 2;
 		}
 		ptr1=ptr1+len;
@@ -158,12 +142,10 @@ uint8_t GetLinkReverse ( char *S, char *F, char *L, char **end,char **Link)
 }
 
 
-//char* GetLink( char * S,  char * F, char * L, char **end)
 uint8_t GetLink( char * S,  char * F, char * L, char **end,char **Link)
 
 {
 	char * ptr1,* ptr2;
-	//char *Link;
 	size_t diff;
 
 	*Link=NULL;
@@ -172,7 +154,6 @@ uint8_t GetLink( char * S,  char * F, char * L, char **end,char **Link)
 	} else {
 		ptr1 = strstr(S,F);
 		if (ptr1==NULL){
-			//printf("Error Getlink ptr1\n");
 			return 1;
 		}
 		ptr1 = ptr1+strlen(F);
@@ -182,7 +163,6 @@ uint8_t GetLink( char * S,  char * F, char * L, char **end,char **Link)
 	} else {
 		ptr2 = strstr(ptr1,L);
 		if (ptr2 ==NULL){
-			//printf("Error Getlink ptr2\n");
 			return 2;
 		}
 	}
@@ -205,16 +185,13 @@ uint8_t GetLink( char * S,  char * F, char * L, char **end,char **Link)
 void GetTitleNumPage(char *S,char **Title,unsigned int *NumPage)
 {
 	char * sNumPage;
-	//*Title=GetLink(S,"<title>"," - ExHentai.org",NULL);
 	GetLink(S,"<title>"," - ExHentai.org",NULL,Title);
-	//sNumPage=GetLink(S,"Images:</td><td class=\"gdt2\">"," @ ",NULL);
 	GetLink(S,"Images:</td><td class=\"gdt2\">"," @ ",NULL,&sNumPage);
 	*NumPage=atoi(sNumPage);
 
 }
 
 char * GetLinkNextPage(char * S)
-//char * GetLinkNextPage(char *S)
 {
 	char * ret;
 	GetLinkReverse(S,"\" href=\"","\"><img src=\"http://st.exhentai.net/img/n.png\"",NULL,&ret);
@@ -226,7 +203,6 @@ static inline char ConvertCar(char*SC)
 {
 	int i;
 	for (i=0;i<(sizeof(CSTable)/sizeof(CS));i++){
-		//printf("%d %d %d\n",sizeof(CS),sizeof(char),sizeof(char*) );
 		if (strcmp(SC,CSTable[i].S)==0){
 			return CSTable[i].C;
 		}
@@ -254,7 +230,6 @@ char* ConvertLink( char *LI)
 	size=0;
 	Cont=0;
 	ContConv=0;
-	//L=malloc(1);
 	L=NULL;
 	while(ptr1 != NULL){
 		ptr2=strchr(ptr1,';');
@@ -267,7 +242,6 @@ char* ConvertLink( char *LI)
 		SC[ptr2-ptr1+1]='\0';
 		SS=ConvertCar(SC);
 		free(SC);
-		//printf("Car:%c\n",SS);
 	Re:
 		SuppL=realloc(L,size+ptr1-LI+2);
 		if (SuppL==NULL){
@@ -283,7 +257,6 @@ char* ConvertLink( char *LI)
 		size=ptr1-LI+1-ContConv*4;
 		L[ptr1-LI]=SS;
 		L[ptr1-LI+1]='\0';
-		//printf("String:%s\n",L);
 		ptr1=strchr(ptr2,'&');
 		ptr3=ptr2+1;
 		ContConv++;
@@ -297,19 +270,16 @@ char* ConvertLink( char *LI)
 }
 
 
-//char *** AddArgv(int * argc,char ***argv,char * Link){
 static inline void AddArgv(int * argc,char ***argv,char * Link)
 {
 	
 	argc[0]++;
-	//printf("%d %d\n",*argc,(*argc)*sizeof(char**) );
 	*argv=realloc(*argv,(*argc)*sizeof(char**));
 	if (*argv==NULL){
 		perror("Realloc");
 		exit(2);
 	}
 	(*argv)[(*argc)-1]=Link;
-//	return argv;
 
 }
 
@@ -321,8 +291,6 @@ void AddPage(char * LinkPage,int * argc, char *** argv,CURL* curl,char * Skip,ch
 	CURLcode res;
 	uint8_t SP[25];
 	memset(SP,0,sizeof(uint8_t)*25);
-	//printf("Skip==%s\n",Skip );
-	//printf("%s\n", type);
 	if (Skip!=NULL){
 		do{
 			ptr1=strchr(Skip,',');
@@ -335,15 +303,10 @@ void AddPage(char * LinkPage,int * argc, char *** argv,CURL* curl,char * Skip,ch
 				ptr2[0]=0;
 				memset(SP+atoi(Skip)-1,0x01,sizeof(uint8_t)*(atoi(ptr2+1)-atoi(Skip)+1)	);
 			}
-			Skip=ptr1+1;
-			//for (i=0;i<25;i++){
-			//	printf("%d ",SP[i] );
-			//}
-			//printf("\n");		
+			Skip=ptr1+1;	
 		} while(ptr1!=NULL);
 
 	}
-	//MainPage.mem=(char*)malloc(1);
 	MainPage.mem=NULL;
 	MainPage.size=0;
 
@@ -356,21 +319,15 @@ void AddPage(char * LinkPage,int * argc, char *** argv,CURL* curl,char * Skip,ch
 	}
 	MainPage.mem[MainPage.size]='\0';
 	ptr2=MainPage.mem;
-	//do{
-	//printf("%s\n",ptr2 );
 	for(i=0; ; i++){
-		//ptr1=strstr(ptr2,"id2");
 		ptr1=strstr(ptr2,type);
 		if (ptr1==NULL){
 			return;
 		}
 		GetLink(ptr1,"href=\"","\"",&ptr2,&Link);
-		//printf("Link=%s\n",Link );
 		if (!SP[i]){
-			//printf("n=%d sp=%d   ",i+1,SP[i] );
 			AddArgv(argc,argv,Link);
 		}
-	//}while(TRUE);
 	}
 }
 
@@ -385,9 +342,6 @@ static inline char * ReplaceAll(char* T,char C,char V)
 	return T;
 }
 
-/*
-	char \ / ? * : < > " | 
- */
 void FixTitle(char* Title)
 {
 	char R[]={ '\\', '/', '?', '*', ':', '<','>', '"', '|' };
@@ -403,7 +357,6 @@ wchar_t* fromUTF8toUTF16 (char * U8)
 	wchar_t *U16;
 	size_t dim=0;;
 	size_t dimU8=strlen(U8);
-	//FILE * f;
 	int ptr=0;
 	int Cont=0;
 	do {
@@ -428,18 +381,15 @@ wchar_t* fromUTF8toUTF16 (char * U8)
 		U16[dim]='\0';
 
 		if ((U8[ptr]&0x80)==0x00){
-			//printf("%c\n", U8[ptr]);
 			U16[dim-1]=U8[ptr];
 			ptr++;
 			continue;
 		}
-		/*6*/
 		if ((U8[ptr]&0xE0)==0xC0){
 			U16[dim-1]=((U8[ptr]&0x1F)<<6)|((U8[ptr+1])&0x3F);
 			ptr=ptr+2;
 			continue;
 		}
-		//printf("ptr=%d dim=%d hex=%X\n",ptr,dimU8,U8[ptr] );
 		if ((U8[ptr]&0xF0)==0xE0){
 			U16[dim-1]=((U8[ptr]&0x0F)<<12)|((U8[ptr+1]&0x3C)<<6)|(((U8[ptr+1]&0x03)<<6)|((U8[ptr+2]&0x3F)));
 			ptr=ptr+3;
@@ -448,7 +398,6 @@ wchar_t* fromUTF8toUTF16 (char * U8)
 		printf("Error UTF 8\n");
 		free(U16);
 		return NULL;
-
 	}
 	return	U16;
 }
@@ -465,7 +414,6 @@ int StartImg(int NumPage,char ** P, char *H,char*LinkPage,CURL * curl,struct Mem
 						 wchar_t* WTitle,uint8_t NumImg)
 {
 	int i,g;
-	//char NameImg[5];
 	char Sapp[20],supp[200];
 	wchar_t WNameImg[256];
 	HANDLE h;
@@ -473,19 +421,13 @@ int StartImg(int NumPage,char ** P, char *H,char*LinkPage,CURL * curl,struct Mem
 	CURLcode res;
 	g=num_digit(NumPage);
 	for (i=1;i<=NumPage;i++){
-		//sprintf(NameImg,"%0*d.*",g,i );
 		swprintf(WNameImg,L"%s\\%0*d.*",WTitle,g,i);
-		//printf("%s\n",NameImg );
 		h=FindFirstFileW(WNameImg,&d);
 		if (h==INVALID_HANDLE_VALUE ){
-			//printf("find %d %s\n",i,d.cFileName );
 			sprintf(Sapp,"\"><img alt=\"%0*d",g,i);
 			if (i>NumImg){
-				//printf("LinkPage %s \n",LinkPage);
 				sprintf(supp,"%s?p=%d",LinkPage,i/NumImg);
-				//printf("supp %s\n",supp);
 				free(Page->mem);
-				//Page->mem=malloc(1);
 				Page->mem=NULL;
 				Page->size=0;
 				curl_easy_setopt(curl,CURLOPT_URL,supp);
@@ -499,8 +441,6 @@ int StartImg(int NumPage,char ** P, char *H,char*LinkPage,CURL * curl,struct Mem
 				H[Page->size]='\0';	
 				memcpy(H,Page->mem,Page->size);		
 			}
-			//printf("sapp  %s\n",Sapp );
-			//printf("H %s\n",H );
 			GetLinkReverse(H,"a href=\"",Sapp,NULL,P);
 			return i;
 		}
@@ -539,13 +479,10 @@ char * ExcludeInTag(char * Exclude,struct _Tag *tag)
 	char *r;
 	for (i=0;i<10;i++){
 		for (j=0;j<tag[i].n;j++){
-			//printf("check %d\n",i );
-			//printf("%s vs %s = %s \n",tag[i].l[j],Exclude,strstr(tag[i].l[j],Exclude) );
 			if ((r=strstr(tag[i].l[j],Exclude))){
 				return r;
 			}
 		}
-		//printf("end check %d\n",i);
 	}
 	return NULL;
 }
@@ -555,8 +492,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 				DWORD ThreadId,int ThreadNum,char ** ExcludeTag,int NumExcludeTag,uint8_t NumImg)
 {
 	char *P=NULL,*LinkImg,*LinkNextPage;
-	//char NameImg[10];
-	//wchar_t *WNameImg;
 	wchar_t WNameImg[256];
 	char *Title,*End;
 	wchar_t *WTitle;
@@ -569,25 +504,17 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 	struct Mem Page;
 	unsigned int NumPage,i;
 	int Cont;
-	//int j;
 	CurlGal = curl_easy_init();
 	if(!CurlGal) {
 		printf("Error\n");
 		return ;
 	}
-
-	//End=malloc(1);
 	End=NULL;
 	memset(Tag,0,sizeof(Tag));
-	//printf("%d %d \n",sizeof(Tag),sizeof(struct _Tag)*10 );
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA , &Page);
-
-
 	curl_easy_setopt(CurlGal, CURLOPT_WRITEFUNCTION ,&WriteImg);
-	//Page.mem=(char*)malloc(1);
 	Page.mem=NULL;
 	GetTitleNumPage(HP.mem,&Title,&NumPage);
-//printf("%s\n",HP.mem );
 	if (Title==NULL || NumPage == 0){
 		printf("Error GetTitleNumPage\n");
 		printf("%s\n",HP.mem );
@@ -598,7 +525,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 	GalleryNum++;
 	printf("%d/%d\n",GalleryNum,NumGallery );
 	_ReleaseMutex(MutexNumGallery);
-	//printf("%d/%d\nTitle:%s\nNum Page:%u\n",GalleryNum,NumGallery,Title,NumPage);
 	printf("Title:%s\nNum Page:%u\n",Title,NumPage);
 	if (NumPage<MinPage||NumPage>MaxPage){
 		printf("%s Min/Max Page Exit\n",Title);
@@ -608,14 +534,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 	}
 	if (ExcludeTag){
 		GetTagGallery(HP.mem,Tag);
-		/*
-		for (j=0;j<10;j++){
-			for (i=0;i<Tag[j].n;i++){
-				printf("%s\n", Tag[j].l[i]);
-			}
-			printf("Next\n");
-		}
-		*/
 		for (i=0;i<NumExcludeTag;i++){
 			if ((P=ExcludeInTag(ExcludeTag[i],Tag))){
 				printf("%s Exclude tag %s\n",Title,P);
@@ -625,9 +543,7 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 			}
 		}
 	}
-	//printf("%s\n",Title );
 	Title=ConvertLink(Title);
-	//printf("%s\n",Title );
 	FixTitle(Title);
 	Cont =0;
 	do{
@@ -638,7 +554,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 		printf("Error WTitle Convert");
 		return ;
 	}
-//	if (!CreateDirectory(Title,NULL)){
 	if (!CreateDirectoryW(WTitle,NULL)){
 		if (GetLastError()!=183){
 			printf("CreateDirectory %ld\n",GetLastError());
@@ -649,18 +564,12 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 	
 
 	for (i=StartImg(NumPage,&P,HP.mem,LinkPage,curl,&Page,WTitle,NumImg);i<=NumPage;i++){
-		//WaitForSingleObject(Mutex, INFINITE);
 		_WaitForSingleObject(Mutex);
-		//printf("End Prog%d\n",EndProg );
 		if (EndProg==1){
 			_ReleaseMutex(Mutex);
 			break;
 		}
-		//_ReleaseMutex(Mutex);
 		_ReleaseMutex(Mutex);
-		//if (EndProg==0){
-		//	printf("%d\n",EndProg );
-		//}
 		if ((*PageNow)==PageMax){
 			Sleep(60000);
 			(*PageNow)=0;
@@ -676,14 +585,11 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 		if (Page.mem==NULL){
 			perror("Mealloc Page.mem");
 			if (Cont>MaxTry){
-				//SetCurrentDirectory("..");
 				return ;
 			}
 			goto try;
 		}
 		Page.size=0;
-
-		//printf("P%s\n",P );
 		curl_easy_setopt(curl,CURLOPT_URL,P);
 		curl_easy_setopt(curl,CURLOPT_PROXY,proxy[i%ProxyNum]);
 		curl_easy_setopt(CurlGal,CURLOPT_PROXY,proxy[i%ProxyNum]);
@@ -695,7 +601,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 					    ThreadNum,curl_easy_strerror(res));
 				Cont++;
 				if (Cont>MaxTry){
-					//SetCurrentDirectory("..");
 					return ;
 				}
 			}else{
@@ -703,8 +608,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 			}
 		}while(TRUE);
 		Page.mem[Page.size]='\0';
-		//printf("%s\n", Page.mem);
-		//GetLink(Page.mem,"><img id=\"img\" src=\"","\" style=",&End,&LinkImg);
 		if (GetLink(Page.mem,"><img id=\"img\" src=\"","\" style=",&End,&LinkImg)){
 			printf("Error GetLink LinkImg\n");
 			goto cont3;
@@ -721,17 +624,14 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 			printf("Error sprintf\n");
 			continue;
 		}	
-		//if ((FileImg=fopen(NameImg,"r"))){
 		if ((FileImg=_wfopen(WNameImg,L"r"))){
 			printf("%d Exist ",i);
 			goto cont2;
 		}
-		//FileImg=fopen(NameImg,"wb");
 		if ((FileImg=_wfopen(WNameImg,L"wb"))==NULL){
 			perror("fopen");
 			goto cont3;
 		}
-		//FileImg=fopen(NameImg,"wb");
 		curl_easy_setopt(CurlGal,CURLOPT_URL,LinkImg);
 		curl_easy_setopt(CurlGal, CURLOPT_WRITEDATA , FileImg);
 		Cont=0;
@@ -755,21 +655,13 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 		fclose(FileImg);
 		if (res != CURLE_OK){
 			DeleteFileW(WNameImg);
-			//DeleteFile(NameImg);
 		}
 	cont3:
 		LinkNextPage=GetLinkNextPage(End);
-		//printf("Next %s\n",LinkNextPage );
 		free(P);
 		P=LinkNextPage;
 		free(LinkImg);
-
-		//printf("SecSleep %lu\n",SecSleep);
-		//	printf("%p\n", Mutex);
-
 		Sleep(SecSleep);
-
-		//WaitForSingleObject(Mutex, INFINITE);
 	}
 	printf("End thread %d %s\n",ThreadNum,Title);
 	if (P==NULL){
@@ -783,7 +675,6 @@ void  GetGallery(struct Mem HP,char *LinkPage ,CURL * curl,
 }
 
 DWORD WINAPI StartGallery(void *para)
-//void StartGallery(void * para)
 {
 	ParamGallery * par= (ParamGallery *)para;
 	int i;
@@ -791,35 +682,23 @@ DWORD WINAPI StartGallery(void *para)
 	CURL *curl;
 	CURLcode res;
 	struct Mem HP;
-	//printf("Start Thread %d\n",par->ThreadNum);
 	curl = curl_easy_init();
 	if(!curl) {
 		printf("Error\n");
 		return 1;
 	}
-	//	printf("Start Thread %d\n",par->ThreadNum);
-
-/*
-	for (i=0;i<par->NumExcludeTag;i++){
-		printf("Thread %d :  Exclude %s\n",par->ThreadNum,(par->ExcludeTag)[i] );
-	}
-	*/
 	curl_easy_setopt(curl, CURLOPT_COOKIEFILE,cookie);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION ,&WriteMem);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	
 	for (i=0;i<par->NumGallery;i++){
-		//WaitForSingleObject(Mutex, INFINITE);
 		_WaitForSingleObject(Mutex);
 		if (EndProg){
 			_ReleaseMutex(Mutex);
 			break;
 		}
 		_ReleaseMutex(Mutex);
-		//_ReleaseMutex(Mutex);
-		//printf("%s\n",(par->LinkPage)[i] );
 		curl_easy_setopt(curl, CURLOPT_PROXY,(par->proxy)[i%(par->ProxyNum)]);
-		//printf("Start %s\n", (par->proxy)[i%(par->ProxyNum)]);	
 		curl_easy_setopt(curl, CURLOPT_URL, (par->LinkPage)[i]);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA , &(HP));
 		res = curl_easy_perform(curl);
@@ -865,12 +744,8 @@ char * NextPage(char * LinkPage)
 	char *Next=NULL,*ptr;
 	int page=0,l=0;
 	int diff=0;
-	//char c='\0'
 	ptr=strstr(LinkPage,"/?page");
-	//printf("%s %d\n",LinkPage,strlen(LinkPage) );
 	if (ptr!=NULL){
-		//printf("%s\n",ptr );
-		//printf("%s\n",ptr2 );
 		page=strtol(ptr+7,NULL,10);
 		if (page==9||page==99){
 			l=1;
@@ -886,7 +761,6 @@ char * NextPage(char * LinkPage)
 			while(atoi(ptr-1)!=0 || atoi(ptr-2)!=0){
 				ptr--;
 			}
-			//printf("pp %s diff %d \n",ptr,ptr-LinkPage );
 			if (ptr-LinkPage==strlen(LinkPage)){
 				page=1;
 				l=2;
@@ -902,27 +776,19 @@ char * NextPage(char * LinkPage)
 				}
 
 			}
-			//printf("%d\n", page);
 			Next=malloc(sizeof(char)*(strlen(LinkPage)+l));
 			memcpy(Next,LinkPage,strlen(LinkPage)-diff);
 			sprintf(Next+strlen(LinkPage)-diff,"/%d",page);
-			//printf("finw %s\n",Next );
 			free(LinkPage);
 			return Next;
 		}
 	}
 	Next=malloc(sizeof(char)*(strlen(LinkPage)+2+l));
-	//printf("ptr %s\n", ptr);
 	diff=ptr-LinkPage;
 	memcpy(Next,LinkPage,diff);
-	//printf("Next ff %s\n",Next);
 	diff += sprintf(Next+diff,"/?page=%d",page+1);
-	//printf("diff=%d l=%d NN=%s LinkPage=%s\n",diff,l,Next,LinkPage +diff +ll);
 	strcat(Next+diff,LinkPage+diff-l);
-	//printf("first next %s\n",Next);
-	//strcat(Next+diff,ptr2);
 	free(LinkPage);
-	//printf("Next %s\n",Next);
 	return Next;
 
 
@@ -954,14 +820,11 @@ char * CreateTag(char * s)
 	} else {
 		memset(ret,'0',sizeof(char)*10);
 	}
-	
-	//while((ptr=strchr(s,','))!=NULL){
 	do{
 		ptr=strchr(s,',');
 		if (ptr!=NULL){
 			*ptr='\0';
 		}
-		//printf("%s %s\n",s,ptr );
 		switch (s[0]){
 			case 'd':
 				ret[0]='1';
@@ -997,7 +860,6 @@ char * CreateTag(char * s)
 				break;
 		}
 		s=ptr+1;
-		//printf("s%p ptr%p\n",s,ptr );
 	}while (ptr!=NULL);
 	return ret;
 
@@ -1018,29 +880,20 @@ void AddFromFile(char * NomeFile,char *** arr,int * Num,uint8_t err)
 		perror("malloc");
 		exit(1);
 	}
-		//printf("Ciao1\n");
 	while (1){
 		if (fscanf(f,"%s",s)==EOF){
 			break;
 		}
-			//printf("s %s\n",s );
-			//printf("Ciao2\n");
 		s2=malloc(strlen(s)+1);
 		if (s2==NULL){
 			perror("malloc");
 			exit(1);
 		}
-			//printf("Ciao3\n");
 		memcpy(s2,s,strlen(s)+1);
 		s2[strlen(s)]='\0';
 		AddArgv(Num,arr,s2);
-		//	printf("Ciao4\n");
 	}
-		//		printf("Ciao5\n");
-
 	free(s);
-			//	printf("Ciao6\n");
-
 	fclose(f);
 }
 
@@ -1061,13 +914,11 @@ ParamGallery * SepareteGallery(int NumThread,int optind,int argc,char **Cargv,
 	if ((kk=(NumGallery)/NumThread)<(double)(NumGallery)/NumThread){
 		kk++;
 	} 
-	//printf("NumThread %d\n",NumThread);
 	ret=malloc(sizeof(ParamGallery)*NumThread);
 	if (ret==NULL){
 		perror("Malloc Param");
 		exit(2);
 	}
-	//printf("%s\n",Type );
 	for (i=0;i<NumThread;i++){
 		ret[i].NumGallery=0;
 		ret[i].ProxyNum=0;
@@ -1117,7 +968,6 @@ char * GetType(char* cookie)
 		exit(1);
 	}
 	memset(s2,0,sizeof(char)*6);
-	//printf("%d %d\n",sizeof(s2),sizeof(char)*6 );
 	while (1){
 		fscanf(f,"%s",s);
 		if ((ptr=strstr(s,"uconfig"))){
@@ -1144,23 +994,17 @@ char * GetType(char* cookie)
 void SigInt ( int sig)
 {
 	printf("Closing ");
-	//WaitForSingleObject(Mutex, INFINITE);
 	_WaitForSingleObject(Mutex);
 	printf("Closing\n");
 	EndProg=1;
-	//_ReleaseMutex(Mutex);
 	_ReleaseMutex(Mutex);
 }
 
 int main (int argc,char **argv)
 {
 	CURL *curl;
-	//CURLcode res;
-	//struct Mem HomePage;
 	unsigned int i;
-	//double SecSleep;
 	int opt,optindex;
-	//char *cookie,
 	char **LinkPage=NULL;
 	char *LP=NULL;
 	int numLinkPage=0;
@@ -1181,19 +1025,11 @@ int main (int argc,char **argv)
 	char *Type=NULL;
 	HANDLE * hThread=NULL;
 	int Cargc;
-	//DWORD *ThreadId;
-	//unsigned int PageMax=400;
-	//unsigned int PageNow=0;
 	int NumThread=1;
-	//char * ET=NULL;
 	char ** ExcludeTag=NULL;
 	int NumExcludeTag=0;
-	ParamGallery *param;
-	
+	ParamGallery *param;	
 	int j=1;
-	//char * Path= NULL;
-	//CopyArgv(argc,argv,&Cargv);
-
 	struct option long_opt[]={
 		{"page",optional_argument,NULL,'p'},
 		{"directory",required_argument,NULL,'d'},
@@ -1238,73 +1074,45 @@ int main (int argc,char **argv)
 		perror("Malloc cookie");
 		return 1;
 	}
-	/*
-	ProxyFile=malloc(sizeof(char)*100);
-	if (cookie==NULL){
-		perror("Malloc proxyfile");
-		return 1;
-	}*/
 	DefaultFile=malloc(sizeof(char)*100);
 	if (cookie==NULL){
 		perror("Malloc DefaultFile");
 		return 1;
 	}
 	memset(cookie,0,sizeof(char)*100);
-	//memset(ProxyFile,0,sizeof(char)*100);
 	memset(DefaultFile,0,sizeof(char)*100);
 	GetModuleFileName(NULL,cookie, (sizeof(char))*100); 
-	//GetModuleFileName(NULL,ProxyFile, (sizeof(char))*100); 
 	GetModuleFileName(NULL,DefaultFile, (sizeof(char))*100); 
 	if (strrchr(argv[0],'\\')!=NULL){
 		 GetLinkReverse(argv[0],"\\",NULL,NULL,&Pname);
 	} else {
 		Pname= argv[0];
 	}
-	//printf("Ciao\n");
-	//printf("%s\n", GetLinkReverse(argv[0],"\\",NULL,NULL));
 	memset(&(cookie[strlen(cookie)-strlen(Pname)]),0,strlen(Pname)+1);
-	//printf("%s\n",cookie );
 	strcat(cookie,"cookie");
-	//memset(&(ProxyFile[strlen(ProxyFile)-strlen(Pname)]),0,strlen(Pname)+1);
-	//strcat(ProxyFile,"proxy");
 	memset(&(DefaultFile[strlen(DefaultFile)-strlen(Pname)]),0,strlen(Pname)+1);
 	strcat(DefaultFile,"default");
 	proxy=malloc(sizeof(char*));
 	*proxy=malloc(sizeof(char)*5);
 	memset(*proxy,0,sizeof(char)*5);
 	strcat(*proxy,"");
-	//printf("%s\n", ProxyFile);
-	//printf("%s\n",cookie );
 	Cargv=malloc(sizeof(char*));
 	memset(Cargv,0,sizeof(char*));
 	Cargv[0]=argv[0];
 	AddFromFile(DefaultFile,&Cargv,&j,0);
 	j--;
-	//printf("%d\n",j+Cargc );
 	Cargv=realloc(Cargv,sizeof(char*)*(j+Cargc));
 	if (Cargv==NULL){
 		perror("Malloc Carv");
 		return 1;
 	}
-	//printf("%d %\n",j,Cargc );
 	for (i = 1; i < Cargc; ++i){
-		//printf("%s %d\n",argv[i],i+j );
 		Cargv[i+j]=argv[i];
 	}
 	Cargc=Cargc+j;
-	/*
-	printf("argc %d \n",Cargc);
-	for (i=0;i<Cargc;i++){
-		printf("Carv %s\n",Cargv[i] );
-	}
-	return 0;
-	*/
-	//while((opt = getopt(argc,argv,"c:m:p::l:f:d:"))!=-1){
-	//printf("ciao %d \n", Cargc);
 	while ((opt=getopt_long(Cargc,Cargv,
 		               "c:m:p::l:f:d:s:n:hr::k:a:t:P::T:voVx:N:",
 		               long_opt,&optindex))!=-1){
-	//	printf("%c\n",opt );
 		switch(opt) {
 		case 'x':
 			SepareTag(&ExcludeTag,optarg,&NumExcludeTag);
@@ -1322,25 +1130,14 @@ int main (int argc,char **argv)
 			NumThread=atoi(optarg);
 			break;
 		case 'c':
-			//printf("%s\n",optarg );
 			free(cookie);
-			/*
-			GetModuleFileName(NULL,cookie, (sizeof(char))*100); 
-			printf("%s\n",cookie );
-			memset(&(cookie[strlen(cookie)-strlen(Pname)]),0,strlen(Pname)+1);
-			printf("%s\n",cookie );
-			strcat(cookie,optarg);
-			printf("%s\n",cookie );
-*/
 			cookie=optarg;
 			break;
 		case 'm':
 			MaxTry=atoi(optarg);
 			break;
 		case 'p':
-			//printf("Page %s\n",optarg );
 			if (optarg!=NULL) {
-				//LinkPage=optarg;
 				AddArgv(&numLinkPage,&LinkPage,optarg);
 			}else{
 				LP=malloc(sizeof(char)*50);
@@ -1348,7 +1145,6 @@ int main (int argc,char **argv)
 					perror("Malloc LinkPage");
 					return 1;
 				}
-				//strcpy(LinkPage,"http://exhentai.org/\0");
 				sprintf(LP,"http://exhentai.org/?page=%d",Page-1);
 				AddArgv(&numLinkPage,&LinkPage,LP);
 				Rec=realloc(Rec,sizeof(int)*numLinkPage);
@@ -1360,13 +1156,11 @@ int main (int argc,char **argv)
 			break;
 		case 'l':
 			SecSleep=1000*strtod(optarg,NULL);
-			//printf("%lu\n",SecSleep );
 			break;
 		case 'k':
 			Skip=optarg;
 			break;
 		case 'f':
-			//Nfile=optarg;
 			LoadLinkFromFile(&argc,&Cargv,optarg);
 			break;
 		case 'd':
@@ -1375,7 +1169,6 @@ int main (int argc,char **argv)
 		case 'h':
 			printf("--page -p \n--skip -k \n--minpage -n\n--directory -d\n--sleep -l\n--max-try -m \n--search -s\n");
 			printf("--tag -t doujinshi,manga,artistcg,gamecg,wes,nonh,imageset,cosplay,asianporn,misc\n--start-page -a");
-			//return 0;
 			break;
 		case 'n':
 			MinPage=atoi(optarg);
@@ -1403,25 +1196,17 @@ int main (int argc,char **argv)
 				r++;
 			}
 			Rec[numLinkPage-1]=r;
-			//ReplaceAll(Search,' ','+');
 			break;
 		case 't':
 			Tag=CreateTag(optarg);
-			//printf("%s\n", Tag);
 			if (Search==NULL){
 				Search="\0";
 			}
 			break;
 		case 'a':
 			Page=atoi(optarg);
-			/*
-			if (LinkPage!=NULL){
-				sprintf(LinkPage,"http://exhentai.org/?page=%d",Page-1);
-			}
-			*/
 			break;
 		case 'P':
-			//free(ProxyFile);
 			ProxyFile=optarg;
 			break;
 		default :
@@ -1429,30 +1214,13 @@ int main (int argc,char **argv)
 		}
 
 	}
-	//printf("fine sw\n");
-	/*
-	for (i=0;i<argc;i++){
-		printf("Carg %s\n",Cargv[i]);
-	}
-	*/
 	Type=GetType(cookie);
-	//printf("Ciao\n");
-
 	if (ProxyFile!=NULL){
 		AddFromFile(ProxyFile,&proxy,&ProxyNum,1);
 	}
-	//	printf("Ciao\n");
 	if (Dir!=NULL){
 		SetCurrentDirectory(Dir);
 	}
-//	printf("Ciao\n");
-	/*
-	printf("Num Link %d\n",numLinkPage);
-	for (j=0;j<numLinkPage;j++){
-		printf("LinkPage:%s %d\n",LinkPage[j],Rec[j]);
-	}
-	*/
-	//printf("%d %d\n",Rec,NumThread );
 	if (LinkPage){
 		curl = curl_easy_init();
 
@@ -1469,7 +1237,6 @@ int main (int argc,char **argv)
 
 
 				printf("Add Page: %s\n",LinkPage[j]);
-				//printf("%s\n",LinkPage );
 				if (Skip!=NULL){
 					sk=strchr(Skip,'/');
 					if (sk!=NULL){
@@ -1477,7 +1244,6 @@ int main (int argc,char **argv)
 					} 
 				}
 				AddPage(LinkPage[j],&Cargc,&Cargv,curl,Skip,Type);
-				//printf("ciao\n");
 				if (sk!=NULL){
 					Skip=sk+1;
 				}else {
@@ -1491,16 +1257,12 @@ int main (int argc,char **argv)
 		}
 		curl_easy_cleanup(curl);
 	}
-	//return 0;
-	//printf("Numthread %d NumProxy %d NumGallery %d\n",NumThread,ProxyNum,argc-optind );
 	if (ProxyNum<NumThread){
 		NumThread=ProxyNum;
 	}
 	if (Cargc-optind<NumThread){
 		NumThread=Cargc-optind;
 	}
-	//printf("%\n");
-	//printf("Numthread %d NumProxy %d NumGallery %d\n",NumThread,ProxyNum,argc-optind );
 	if (NumThread==0){
 		return 0;
 	}
@@ -1510,17 +1272,6 @@ int main (int argc,char **argv)
 	hThread=malloc(sizeof(HANDLE)*NumThread);
 	signal(SIGINT,SigInt);
 	for (i=0;i<NumThread;i++){
-		/*
-		printf("Thread %d\n",i );
-		for (j=0;j<param[i].ProxyNum;j++){
-			printf("%s\n",param[i].proxy[j] );
-		}
-		printf("%d\n",param[i].ProxyNum );
-		for (j=0;j<param[i].NumGallery;j++){
-			printf("%s\n",param[i].LinkPage[j] );
-		}
-		printf("%d\n",param[i].NumGallery );
-		*/
 		hThread[i]=CreateThread(NULL,0,StartGallery,&(param[i]),0,&(param[i].ThreadId));
 		if (hThread[i]==NULL){
 			printf("Problema CreateThread %lu\n",GetLastError());
